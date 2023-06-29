@@ -15,34 +15,47 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+struct table {
+	struct table *	  left;
+	struct table *	  right;
+	LOOKUP_TABLE_TYPE lookup;
+	KEY_TYPE	  keys[TABLE_SIZE];
+	VALUE_TYPE	  values[TABLE_SIZE];
+};
+
+enum table_insert_res {
+	INSERT_LEFT	 = 3,
+	INSERT_RIGHT	 = 2,
+	INSERT_COMPLETED = 0,
+	UPSERT_COMPLETED = 1
+};
 	
-	
-	struct table {
-		struct table * left;
-		struct table * right;
-		LOOKUP_TABLE_TYPE lookup;
-		KEY_TYPE keys [TABLE_SIZE];
-		VALUE_TYPE values [TABLE_SIZE];
-		
+	enum table_get_res {
+		GET_NOTFOUND = 3,
+		GET_LEFT = 2,
+		GET_RIGHT = 1,
+		GET_COMPLETED = 0
 	};
 	
-	enum table_insert_res {
-		INSERT_LEFT,
-		INSERT_RIGHT,
-		INSERT_COMPLETED,
-		UPSERT_COMPLETED
+	struct table_get_result {
+		enum table_get_res response_type;
+		VALUE_TYPE value;
 	};
+
+void table_init(struct table *);
+
+struct table * talloc(void);
+
+enum table_insert_res table_insert(
+	struct table *, LOCAL_KEY_TYPE, KEY_TYPE,
+	VALUE_TYPE value
+);
 	
-	enum table_insert_res table_insert(
-									   struct table * tab,
-									   KEY_TYPE layer_key,
-									   KEY_TYPE key,
-									   VALUE_TYPE value
-									);
-	
+	struct table_get_result table_get(struct table *, LOCAL_KEY_TYPE, KEY_TYPE);
+
 #ifdef __cplusplus
 }
 #endif
-
 
 #endif /* table_h */
