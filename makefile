@@ -5,8 +5,7 @@ HDRS = $(shell find ./src/include -name "*.h")
 OBJS = $(patsubst %.c, %.o, $(SRCS))
 FLAGS = -O3 -ftree-vectorize
 CPPFLAGS = -std=c++17  -O3 -Wall 
-TARGET = main 
-TESTING_TARGET = testing
+TARGET = testing
 
 all: testing
 
@@ -14,7 +13,7 @@ main: $(OBJS)
 	$(CC) $(FLAGS) main.c -o $(TARGET) $(OBJS)
 
 testing: $(OBJS)
-	$(CPP) $(CPPFLAGS) testing.cpp -o $(TESTING_TARGET) $(OBJS)
+	$(CPP) $(CPPFLAGS) main.cpp -o $(TARGET) $(OBJS)
 
 %.o: %.c
 	$(CC) $(FLAGS) -c $< -o $@

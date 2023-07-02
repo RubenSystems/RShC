@@ -22,7 +22,20 @@ struct container {
 
 void container_init(struct container *);
 
+enum table_get_responses {
+	CONTAINER_GET_NOTFOUND	= 1,
+	CONTAINER_GET_COMPLETED = 0
+};
+
+struct container_get_result {
+	VALUE_TYPE		 value;
+	enum table_get_responses response;
+};
+
 void container_insert(struct container *, KEY_TYPE, VALUE_TYPE);
+
+struct container_get_result
+container_get(struct container * cont, KEY_TYPE key);
 
 #ifdef __cplusplus
 }

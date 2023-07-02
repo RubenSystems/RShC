@@ -30,29 +30,27 @@ enum table_insert_res {
 	INSERT_COMPLETED = 0,
 	UPSERT_COMPLETED = 1
 };
-	
-	enum table_get_res {
-		GET_NOTFOUND = 3,
-		GET_LEFT = 2,
-		GET_RIGHT = 1,
-		GET_COMPLETED = 0
-	};
-	
-	struct table_get_result {
-		enum table_get_res response_type;
-		VALUE_TYPE value;
-	};
+
+enum table_get_res {
+	GET_NOTFOUND  = 3,
+	GET_LEFT      = 2,
+	GET_RIGHT     = 1,
+	GET_COMPLETED = 0
+};
+
+struct table_get_result {
+	enum table_get_res response_type;
+	VALUE_TYPE	   value;
+};
 
 void table_init(struct table *);
 
 struct table * talloc(void);
 
-enum table_insert_res table_insert(
-	struct table *, LOCAL_KEY_TYPE, KEY_TYPE,
-	VALUE_TYPE value
-);
-	
-	struct table_get_result table_get(struct table *, LOCAL_KEY_TYPE, KEY_TYPE);
+enum table_insert_res
+table_insert(struct table *, LOCAL_KEY_TYPE, KEY_TYPE, VALUE_TYPE value);
+
+struct table_get_result table_get(struct table *, LOCAL_KEY_TYPE, KEY_TYPE);
 
 #ifdef __cplusplus
 }

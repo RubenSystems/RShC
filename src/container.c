@@ -5,7 +5,7 @@
 //  Created by Ruben Ticehurst-James on 28/06/2023.
 //
 
-#include "container.h"
+#include "include/container.h"
 
 #include <stdbool.h>
 #include <stdlib.h>
@@ -20,22 +20,46 @@ static size_t __layer_key(KEY_TYPE key, LAYER_TYPE layer) {
 	return TABLE_WIDTH_MASK & (key >> (layer * TABLE_WIDTH));
 }
 
-VALUE_TYPE container_get(struct container * cont, KEY_TYPE key) {
-	struct table * tab = &cont->root;
-	uint16_t layer_key = 0;
-	LAYER_TYPE layer = 0;
-	
-	while (true) {
+struct container_get_result
+container_get(struct container * cont, KEY_TYPE key) {
+	struct table *		    tab	      = &cont->root;
+	uint16_t		    layer_key = 0;
+	LAYER_TYPE		    layer     = 0;
+	struct table_get_result	    res;
+	struct container_get_result ret;
+
+	do {
 		layer_key = __layer_key(key, layer++);
-		
-	}
+		res	  = table_get(tab, layer_key, key);
+		switch (res.response_type) {
+			case GET_NOTFOUND:
+				ret.response = CONTAINER_GET_NOTFOUND;
+				return ret;
+			case GET_LEFT:
+				tab = tab->left;
+				break;
+			case GET_RIGHT:
+				tab = tab->right;
+				break;
+			case GET_COMPLETED:
+				ret.value    = res.value;
+				ret.response = CONTAINER_GET_COMPLETED;
+				return ret;
+			default:
+				printf("[CONATINER] - table corrupted");
+				exit(1);
+		}
+	} while (tab);
+	
+	ret.response = CONTAINER_GET_NOTFOUND;
+	return ret;
 }
 
 void container_insert(struct container * cont, KEY_TYPE key, VALUE_TYPE val) {
 	struct table * tab = &cont->root;
-	uint16_t	       layer_key;
+	uint16_t       layer_key;
 	LAYER_TYPE     layer = 0;
-	
+
 	while (true) {
 		layer_key = __layer_key(key, layer++);
 
