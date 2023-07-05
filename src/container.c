@@ -22,6 +22,7 @@ static size_t __layer_key(KEY_TYPE key, LAYER_TYPE layer) {
 
 struct container_get_result
 container_get(struct container * cont, KEY_TYPE key) {
+	static max_lay3rs = 0;
 	struct table *		    tab	      = &cont->root;
 	uint16_t		    layer_key = 0;
 	LAYER_TYPE		    layer     = 0;
@@ -48,6 +49,10 @@ container_get(struct container * cont, KEY_TYPE key) {
 			default:
 				printf("[CONATINER] - table corrupted");
 				exit(1);
+		}
+		if (layer > max_lay3rs) {
+			printf("%i\n", layer);
+			max_lay3rs = layer;
 		}
 	} while (tab);
 	
