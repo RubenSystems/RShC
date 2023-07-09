@@ -4,7 +4,7 @@ SRCS = $(shell find ./src -name "*.c")
 HDRS = $(shell find ./src/include -name "*.h")
 OBJS = $(patsubst %.c, %.o, $(SRCS))
 FLAGS = -O3 -ftree-vectorize
-CPPFLAGS = -std=c++17  -O3 -Wall 
+CPPFLAGS = -std=c++17  -O3 -Wall -Werror
 TARGET = testing
 
 all: testing

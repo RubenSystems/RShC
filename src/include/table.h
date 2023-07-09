@@ -2,7 +2,7 @@
 //  table.h
 //  RShC
 //
-//  Created by Ruben Ticehurst-James on 24/06/2023.
+//  Created by Ruben Ticehurst-James on 05/07/2023.
 //
 
 #ifndef table_h
@@ -10,47 +10,49 @@
 
 #include <stdio.h>
 #include "config.h"
-#include "node.h"
+
+#define NODE_EMPTY     0
+#define NODE_DATA      1
+#define NODE_POINTER   2
+
+#define LAYER_KEY_TYPE uint16_t
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 struct table {
-	struct table *	  left;
-	struct table *	  right;
-	LOOKUP_TABLE_TYPE lookup;
-	KEY_TYPE	  keys[TABLE_SIZE];
-	VALUE_TYPE	  values[TABLE_SIZE];
+	uint8_t lookup[LOOKUP_SIZE];
+
+	KEY_TYPE keys[TABLE_SIZE];
+	union {
+		VALUE_TYPE     data;
+		struct table * pointer;
+	} values[TABLE_SIZE];
 };
 
-enum table_insert_res {
-	INSERT_LEFT	 = 3,
-	INSERT_RIGHT	 = 2,
-	INSERT_COMPLETED = 0,
-	UPSERT_COMPLETED = 1
+enum table_get_types { TABLE_GET_NOTFOUND, TABLE_GET_DATA, TABLE_GET_POINTER };
+
+struct table_get_res {
+	KEY_TYPE key;
+
+	union {
+		VALUE_TYPE     data;
+		struct table * pointer;
+	} value;
+
+	enum table_get_types type;
 };
 
-enum table_get_res {
-	GET_NOTFOUND  = 3,
-	GET_LEFT      = 2,
-	GET_RIGHT     = 1,
-	GET_COMPLETED = 0
-};
+void table_unsafe_insert_data(
+	struct table *, LAYER_KEY_TYPE, KEY_TYPE, VALUE_TYPE
+);
 
-struct table_get_result {
-	enum table_get_res response_type;
-	VALUE_TYPE	   value;
-};
+void table_unsafe_insert_pointer(struct table *, LAYER_KEY_TYPE, struct table *);
 
 void table_init(struct table *);
 
-struct table * talloc(void);
-
-enum table_insert_res
-table_insert(struct table *, LOCAL_KEY_TYPE, KEY_TYPE, VALUE_TYPE value);
-
-struct table_get_result table_get(struct table *, LOCAL_KEY_TYPE, KEY_TYPE);
+struct table_get_res table_get(struct table * tab, LAYER_KEY_TYPE layer_key);
 
 #ifdef __cplusplus
 }
